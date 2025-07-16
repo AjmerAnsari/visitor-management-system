@@ -66,45 +66,27 @@ Python 3.8+
 
 MySQL Server
 
-Git (for cloning the repository)
 
 1. Clone the Repository
-git clone https://github.com/YOUR_GITHUB_USERNAME/Visitor-Management-System.git
+git clone https://github.com/AjmerAnsari/Visitor-Management-System.git
 cd Visitor-Management-System
 
-(Replace YOUR_GITHUB_USERNAME with your actual GitHub username and Visitor-Management-System if you named your repository differently.)
 
-2. Set Up a Python Virtual Environment
-It's highly recommended to use a virtual environment to manage project dependencies.
-
-python -m venv venv
-
-3. Activate the Virtual Environment
-On Windows:
-
-.\venv\Scripts\activate
-
-On macOS / Linux:
-
-source venv/bin/activate
-
-(Your terminal prompt should change to (venv) indicating the environment is active.)
-
-4. Install Dependencies
+2. Install Dependencies
 Install all required Python packages using pip:
 
 pip install -r requirements.txt
 
 (If requirements.txt doesn't exist, you can create it after installing Flask and other initial dependencies by running pip freeze > requirements.txt while your venv is active.)
 
-5. Database Setup (MySQL)
-5.1. Create the Database
+3. Database Setup (MySQL)
+3.1. Create the Database
 Connect to your MySQL server (e.g., using MySQL Workbench, phpMyAdmin, or the command line client) and create a new database:
 
 CREATE DATABASE visitors;
 USE visitors;
 
-5.2. Run the Schema
+3.2. Run the Schema
 Execute the SQL commands from your schema.sql file to create the necessary tables.
 
 -- Example content of schema.sql (ensure yours matches your current schema)
@@ -148,14 +130,8 @@ CREATE TABLE IF NOT EXISTS visitors (
 );
 
 -- Insert a default admin user (password 'admin')
-INSERT IGNORE INTO admin_users (username, password_hash, role) VALUES ('admin', 'pbkdf2:sha256:260000$h6wJ7sR2$e9f1a0b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1', 'admin');
+INSERT IGNORE INTO admin_users (username, password_hash, role) VALUES ('admin', 'your_hash_password', 'admin');
 
-(Note: The password_hash for 'admin' is a placeholder. You should generate a proper hash for your default admin password if you're setting one up this way.)
-
-6. Configure Environment Variables (.env file)
-Create a file named .env in the root of your project directory. This file will store your sensitive configurations and should NOT be committed to Git.
-
-# .env
 # Flask Secret Key (REQUIRED for session security)
 SECRET_KEY='your_super_long_and_random_secret_key_here'
 
@@ -166,13 +142,11 @@ MYSQL_PASSWORD='your_mysql_root_password'
 MYSQL_DB='visitors'
 
 Replace the placeholder values with your actual credentials.
-
-7. Run the Application
-With your virtual environment active and .env configured:
+#run in terminal:
 
 python app.py
 
-The application will typically run on http://127.0.0.1:5000/. If you configured it to listen on 0.0.0.0 for phone access, you can use your computer's local IP address (e.g., http://192.168.1.100:5000/).
+The application will typically run on http://127.0.0.1:5000/. 
 
 Usage
 Login: Access the application in your browser. You will be redirected to the login page. Use the default admin credentials (username: admin, password: admin - if you used the default hash provided in schema.sql).
