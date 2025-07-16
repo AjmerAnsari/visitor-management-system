@@ -1,44 +1,219 @@
-Structure :
-visitor-management/                     ← Main project folder
-│
-├── app.py                              ← Main Flask app starter
-├── config.py                           ← Config (MySQL, secret key)
-├── models.py                           ← User model for login session
-├── requirements.txt                    ← Python dependencies
-│
-├── static/                             ← Static files (CSS/JS/images)
+Visitor Management System
+Project Overview
+This is a web-based Visitor Management System built with Flask, designed to streamline the process of managing visitors entering and exiting a premises. It allows for recording visitor details, tracking their check-in and check-out times, managing hosts and departments, and provides administrative functionalities for user management.
+
+Features
+User Authentication: Secure login for admin and sub-users.
+
+Role-Based Access Control:
+
+Admin Users: Full access to manage visitors, departments, hosts, and other admin/sub-users.
+
+Sub-users: Can manage visitors they have added (add, view, edit, delete, check-out).
+
+Visitor Management:
+
+Add new visitor records with details (name, contact, purpose, department, host).
+
+Upload and display visitor photos.
+
+View detailed visitor profiles.
+
+Edit existing visitor information.
+
+Delete visitor records.
+
+Check-out Functionality: Mark visitors as checked out with a timestamp.
+
+Department Management: Admins can add, view, and delete departments.
+
+Host Management: Admins can add, view, and delete hosts, linking them to specific departments.
+
+Responsive Navigation: Modern, mobile-friendly navigation bar with a hamburger menu.
+
+DataTables Integration: Enhanced visitor list with search, pagination, and sorting.
+
+Data Export: Export visitor data (e.g., to CSV).
+
+Custom Confirmation Modals: Improved user experience for delete actions (replaces browser's confirm()).
+
+Technologies Used
+Backend: Python, Flask
+
+Database: MySQL
+
+Frontend: HTML5, CSS3, JavaScript, Jinja2 (templating)
+
+Libraries:
+
+Flask-Login (User session management)
+
+Flask-MySQLdb (MySQL integration)
+
+python-dotenv (Environment variable management)
+
+jQuery (JavaScript library)
+
+DataTables.js (Table enhancements)
+
+Font Awesome (Icons)
+
+Setup Instructions
+Follow these steps to get the project up and running on your local machine.
+
+Prerequisites
+Python 3.8+
+
+MySQL Server
+
+Git (for cloning the repository)
+
+1. Clone the Repository
+git clone https://github.com/YOUR_GITHUB_USERNAME/Visitor-Management-System.git
+cd Visitor-Management-System
+
+(Replace YOUR_GITHUB_USERNAME with your actual GitHub username and Visitor-Management-System if you named your repository differently.)
+
+2. Set Up a Python Virtual Environment
+It's highly recommended to use a virtual environment to manage project dependencies.
+
+python -m venv venv
+
+3. Activate the Virtual Environment
+On Windows:
+
+.\venv\Scripts\activate
+
+On macOS / Linux:
+
+source venv/bin/activate
+
+(Your terminal prompt should change to (venv) indicating the environment is active.)
+
+4. Install Dependencies
+Install all required Python packages using pip:
+
+pip install -r requirements.txt
+
+(If requirements.txt doesn't exist, you can create it after installing Flask and other initial dependencies by running pip freeze > requirements.txt while your venv is active.)
+
+5. Database Setup (MySQL)
+5.1. Create the Database
+Connect to your MySQL server (e.g., using MySQL Workbench, phpMyAdmin, or the command line client) and create a new database:
+
+CREATE DATABASE visitors;
+USE visitors;
+
+5.2. Run the Schema
+Execute the SQL commands from your schema.sql file to create the necessary tables.
+
+-- Example content of schema.sql (ensure yours matches your current schema)
+CREATE TABLE IF NOT EXISTS admin_users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(80) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'subuser' -- 'admin' or 'subuser'
+);
+
+CREATE TABLE IF NOT EXISTS departments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS hosts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100),
+    phone VARCHAR(20),
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS visitors (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    address TEXT,
+    purpose VARCHAR(200),
+    department_id INT,
+    host_id INT,
+    check_in DATETIME DEFAULT CURRENT_TIMESTAMP,
+    check_out DATETIME,
+    created_by INT,
+    photo VARCHAR(255),
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
+    FOREIGN KEY (host_id) REFERENCES hosts(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES admin_users(id) ON DELETE SET NULL
+);
+
+-- Insert a default admin user (password 'admin')
+INSERT IGNORE INTO admin_users (username, password_hash, role) VALUES ('admin', 'pbkdf2:sha256:260000$h6wJ7sR2$e9f1a0b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1', 'admin');
+
+(Note: The password_hash for 'admin' is a placeholder. You should generate a proper hash for your default admin password if you're setting one up this way.)
+
+6. Configure Environment Variables (.env file)
+Create a file named .env in the root of your project directory. This file will store your sensitive configurations and should NOT be committed to Git.
+
+# .env
+# Flask Secret Key (REQUIRED for session security)
+SECRET_KEY='your_super_long_and_random_secret_key_here'
+
+# MySQL Database Configuration
+MYSQL_HOST='localhost'
+MYSQL_USER='root'
+MYSQL_PASSWORD='your_mysql_root_password'
+MYSQL_DB='visitors'
+
+Replace the placeholder values with your actual credentials.
+
+7. Run the Application
+With your virtual environment active and .env configured:
+
+python app.py
+
+The application will typically run on http://127.0.0.1:5000/. If you configured it to listen on 0.0.0.0 for phone access, you can use your computer's local IP address (e.g., http://192.168.1.100:5000/).
+
+Usage
+Login: Access the application in your browser. You will be redirected to the login page. Use the default admin credentials (username: admin, password: admin - if you used the default hash provided in schema.sql).
+
+Dashboard: View all visitors.
+
+Add Visitor: Register new visitors.
+
+Admin Features: If logged in as an admin, use the navigation links to manage departments, hosts, and other users.
+
+Check-out: Mark visitors as checked out from the dashboard.
+
+Project Structure
+visitor_management_system/
+├── app.py                  # Main Flask application file
+├── config.py               # Application configuration (reads from .env)
+├── extensions.py           # Initializes Flask extensions (e.g., MySQL)
+├── models.py               # Database models/helpers (e.g., User class)
+├── requirements.txt        # Python dependencies
+├── schema.sql              # Database schema for MySQL
+├── auth/                   # Blueprint for authentication routes
+│   └── routes.py
+├── users/                  # Blueprint for user management (admin, hosts, departments)
+│   └── routes.py
+├── visitors/               # Blueprint for visitor-related routes
+│   └── routes.py
+├── static/                 # Static files (CSS, JS, images)
 │   ├── css/
-│   │   └── style.css                   ← Global styling + gradient headings
+│   │   └── style.css
 │   ├── js/
-│   │   └── main.js                     ← JS for tables, modals, export, etc.
-│   └── images/                         ← Visitor uploaded images (if needed)
-│
-├── templates/                          ← HTML templates
-1.	│   ├── base.html                       ← Base layout (header, nav, css load)
-2.	│   ├── login.html                      ← Admin/Sub-user login page
-3.	│   ├── dashboard.html                  ← Main dashboard (visitor list + cards)
-4.	│   ├── add_visitor.html                ← Form to register new visitor
-5.	│   ├── edit_visitor.html               ← Edit existing visitor info
-6.	│   ├── manage_departments.html        ← Add/edit/delete departments
-7.	│   ├── manage_hosts.html              ← Add/edit/delete hosts
-8.	│   ├── view_visitor.html              ← View single visitor profile (optional)
-9.	│   └── export.html                     ← Export data filter page
-│
-├── auth/
-│   └── routes.py                       ← Login, logout logic
-│
-├── visitors/
-│   └── routes.py                       ← Dashboard, add/edit/delete visitor
-│
-├── users/
-│   └── routes.py                       ← Admin creates/deletes sub-users
-│
-└── schema.sql                          ← MySQL database creation script
-└── extensions.py
-
-
-
-2. Install requirements.txt
-3. Change secret key and password for mysql DB in config.py file.
-4. Create the sceama provide in sceama.sql (Note: DB name must be 'visitors').
-5. Now run app.py in terminal.
+│   │   └── main.js
+│   └── images/             # Store visitor photos and default-user.png
+├── templates/              # Jinja2 HTML templates
+│   ├── base.html           # Base template for all pages
+│   ├── dashboard.html
+│   ├── login.html
+│   ├── add_visitor.html
+│   ├── view_visitor.html
+│   ├── edit_visitor.html
+│   ├── export.html
+│   ├── manage_departments.html
+│   ├── manage_hosts.html
+│   └── manage_users.html
+              
